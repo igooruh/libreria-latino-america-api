@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,9 +26,9 @@ public class LibrosResource {
 	private LibrosRepository libroRepository;
 
 	@PostMapping("/libro")
-	public String guardarLibro(@RequestBody Libros libro) {
+	public ResponseEntity<String> guardarLibro(@RequestBody Libros libro) {
 		libroRepository.save(libro);
-		return "Saved";
+		return new ResponseEntity<String>("Saved!", HttpStatus.CREATED);
 	}
 
 	@GetMapping("/libro")
@@ -45,8 +47,8 @@ public class LibrosResource {
 	}
 
 	@DeleteMapping("/libro/{id}")
-	public String deletaLibro(@PathVariable(value="id") long id) {
+	public ResponseEntity<String> deletaLibro(@PathVariable(value="id") long id) {
 		libroRepository.deleteById(id);
-		return "Deleted";
+		return new ResponseEntity<String>("Deleted", HttpStatus.ACCEPTED);
 	}
 }
