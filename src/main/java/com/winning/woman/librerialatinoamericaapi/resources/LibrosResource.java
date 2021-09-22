@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.winning.woman.librerialatinoamericaapi.models.Libros;
 import com.winning.woman.librerialatinoamericaapi.repositories.LibrosRepository;
@@ -18,11 +22,13 @@ import com.winning.woman.librerialatinoamericaapi.repositories.LibrosRepository;
 @RequestMapping("/api")
 public class LibrosResource {
 
-	LibrosRepository libroRepository;
+	@Autowired
+	private LibrosRepository libroRepository;
 
 	@PostMapping("/libro")
-	public void guardarLibro(@RequestBody Libros libro) {
+	public ResponseEntity<String> guardarLibro(@RequestBody Libros libro) {
 		libroRepository.save(libro);
+		return new ResponseEntity<String>("Saved!", HttpStatus.CREATED);
 	}
 
 	@GetMapping("/libro")
@@ -40,8 +46,9 @@ public class LibrosResource {
 		return libroRepository.save(libro);
 	}
 
-	@DeleteMapping("/libro")
-	public void deletaLibro(@RequestBody Libros libro) {
-		libroRepository.delete(libro);
+	@DeleteMapping("/libro/{id}")
+	public ResponseEntity<String> deletaLibro(@PathVariable(value="id") long id) {
+		libroRepository.deleteById(id);
+		return new ResponseEntity<String>("Deleted", HttpStatus.ACCEPTED);
 	}
 }
