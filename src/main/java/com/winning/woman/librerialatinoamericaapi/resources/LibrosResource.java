@@ -1,6 +1,8 @@
 package com.winning.woman.librerialatinoamericaapi.resources;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,29 +28,64 @@ public class LibrosResource {
 	private LibrosRepository libroRepository;
 
 	@PostMapping("/libro")
-	public ResponseEntity<String> guardarLibro(@RequestBody Libros libro) {
-		libroRepository.save(libro);
-		return new ResponseEntity<String>("Saved!", HttpStatus.CREATED);
+	public ResponseEntity<Libros> guardarLibro(@RequestBody Libros libro) {
+		try {
+			Libros _libro = libroRepository.save(libro);
+			return new ResponseEntity<>(_libro, HttpStatus.CREATED);
+		} catch(Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@GetMapping("/libro")
-	public List<Libros> listaLibros() {
-		return libroRepository.findAll();
+	public ResponseEntity<List<Libros>> listaLibros() {
+		try {
+			List<Libros> libros = new ArrayList<Libros>();
+			libroRepository.findAll().forEach(libros::add);
+			if(libros.isEmpty()) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+			return new ResponseEntity<>(libros, HttpStatus.OK);
+		} catch(Exception e) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
 	}
 
 	@GetMapping("/libro/{id}")
-	public Libros listaUnicoLibro(@PathVariable(value = "id") long id) {
-		return libroRepository.findById(id);
+	public ResponseEntity<Libros> listaUnicoLibro(@PathVariable(value = "id") long id) {
+		Optional<Libros> librosData = libroRepository.findById(id);
+		if(librosData.isPresent()) {
+			return new ResponseEntity<>(librosData.get(), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
-	@PutMapping("/libro")
-	public Libros actualizacionLibro(@RequestBody Libros libro) {
-		return libroRepository.save(libro);
+	@PutMapping("/libro/{id}")
+	public ResponseEntity<Libros> actualizacionLibro(@PathVariable("id") long id, @RequestBody Libros libro) {
+		Optional<Libros> librosData = libroRepository.findById(id);
+
+		if(librosData.isPresent()) {
+			Libros _libro = librosData.get();
+			_libro.setTitulo(libro.getTitulo());
+			_libro.setAutor(libro.getAutor());
+			_libro.setEstado(libro.getEstado());
+			_libro.setNota(libro.getNota());
+			_libro.setFechaAnadido(libro.getFechaAnadido());
+			_libro.setFechaFinalizacion(libro.getFechaFinalizacion());
+			return new ResponseEntity<>(libroRepository.save(_libro), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@DeleteMapping("/libro/{id}")
-	public ResponseEntity<String> deletaLibro(@PathVariable(value="id") long id) {
-		libroRepository.deleteById(id);
-		return new ResponseEntity<String>("Deleted", HttpStatus.ACCEPTED);
+	public ResponseEntity<HttpStatus> deletaLibro(@PathVariable(value="id") long id) {
+		try {
+			libroRepository.deleteById(id);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

@@ -6,5 +6,4 @@ import com.winning.woman.librerialatinoamericaapi.models.Libros;
 
 public interface LibrosRepository extends JpaRepository<Libros, Long> {
 
-	Libros findById(long id);
 }
