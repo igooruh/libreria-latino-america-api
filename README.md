@@ -3,7 +3,9 @@ Winning Woman Webinars
 
 ### Quickstart
 
-* Install and configure a MySQL Database, a user and a database that matches the configuration stored in your `src/main/resources/application.properties` file.
+* Install and configure a MySQL Database
+* Copy the file `src/main/resources/application.properties.example` to `src/main/resources/application.properties`
+* Create a user and a database that matches the configuration stored in your `src/main/resources/application.properties` file.
 * Test
 ```bash
 ./mvnw test
